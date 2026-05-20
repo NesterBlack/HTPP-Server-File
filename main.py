@@ -46,10 +46,6 @@ def create_html_from_folder(path):
                 file.write(f'\n<span>{name}</span>\n<a href="/download?file={file_path}&name={name}" style="{button_style}">download</a>\n</li>')
             file.write("</ul>")
 
-
-
-    # for i in range(folders_count):
-    #     file.write("</ul>")
     file.write("</body></html></h1></body></html>")
 
 create_html_from_folder(folder_path)
