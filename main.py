@@ -82,6 +82,5 @@ class MyHandler(BaseHTTPRequestHandler):
 
 
 server = HTTPServer(("0.0.0.0", 8000), MyHandler)
-print("Сервер запущен: http://localhost:8000")
+print("Server is start: http://localhost:8000")
 server.serve_forever()
-print("dfdf")
