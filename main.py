@@ -3,8 +3,9 @@ from urllib.parse import urlparse, parse_qs
 import sys
 import os
 from socket import gethostbyname, gethostname
+import pathlib
 
-dirs_ignor = [r"\.git", r"\.venv", r"\.idea"]
+dirs_ignor = [r".git", r".venv", r".idea"]
 
 button_style = """
             padding: 5px 15px;
@@ -54,6 +55,7 @@ create_html_from_folder(folder_path)
 
 class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        print(self.path)
         if self.path == '/':
             self.send_response(200)
             self.send_header("Content-type", "text/html; charset=utf-8")
@@ -64,18 +66,19 @@ class MyHandler(BaseHTTPRequestHandler):
             self.wfile.write(html.encode("utf-8"))
         elif self.path.startswith('/download'):
             params = parse_qs(urlparse(self.path).query)
-            filename = params.get('file', [None])[0]
+            filepath = params.get('file', [None])[0]
             name = params.get('name', [None])[0]
 
+            print(params, filepath, name, self.path)
             if not name:
-                name = filename.split('\\')[-1]
+                name = pathlib.Path(filepath).name
 
-            if filename:
+            if filepath:
                 self.send_response(200)
                 self.send_header("Content-type", "application/octet-stream")
                 self.send_header("Content-Disposition", f'attachment; filename="{name}"')
                 self.end_headers()
-                with open(filename, "rb") as f:
+                with open(filepath, "rb") as f:
                     self.wfile.write(f.read())
 
 
