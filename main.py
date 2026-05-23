@@ -2,6 +2,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import sys
 import os
+from socket import gethostbyname, gethostname
 
 dirs_ignor = [r"\.git", r"\.venv", r"\.idea"]
 
@@ -30,8 +31,9 @@ else:
     folder_path = "."
 
 def create_html_from_folder(path):
+    ip = gethostbyname(gethostname())
     with open("index.html", "w") as file:
-        file.write(f'<html><head><title>HTTP SERVER</title></head><body style="background: {background_color}; color: {font_color}; font-family: Arial; padding: {padding_body};">')
+        file.write(f'<html><head><title>HTTP SERVER</title></head><body style="background: {background_color}; color: {font_color}; font-family: Arial; padding: {padding_body};"><h1 style="text-align: center;">IP: {ip}:8000</h1>')
     file = open("index.html", "a")
     folders_count = 0
     for root, dirs, files in os.walk(path):
