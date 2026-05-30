@@ -5,8 +5,6 @@ import os
 from socket import gethostbyname, gethostname
 from pathlib import Path
 
-# dirs_ignor = [r".git", r".venv", r".idea"]
-
 button_style = """
             padding: 5px 15px;
             background: #4CAF50;
