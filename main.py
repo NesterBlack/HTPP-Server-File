@@ -4,6 +4,7 @@ import sys
 import os
 from socket import gethostbyname, gethostname
 from pathlib import Path
+import webbrowser
 
 button_style = """
             padding: 5px 15px;
@@ -113,5 +114,5 @@ class MyHandler(BaseHTTPRequestHandler):
 
 
 server = HTTPServer(("0.0.0.0", 8000), MyHandler)
-print("Server is start: http://localhost:8000")
+webbrowser.open("http://localhost:8000")
 server.serve_forever()
