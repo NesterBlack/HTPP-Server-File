@@ -5,10 +5,19 @@ import os
 from socket import gethostbyname, gethostname
 from pathlib import Path
 import webbrowser
+import zipfile
 
 button_style = """
             padding: 5px 15px;
             background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 14px;
+        """
+zip_button_style = """
+            padding: 5px 15px;
+            background: #4c79af;
             color: white;
             text-decoration: none;
             border-radius: 20px;
@@ -39,6 +48,20 @@ if len(sys.argv) > 1:
 else:
     folder_path = Path(r".")
 
+"""
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <p style="margin: 0;">Какой-то текст</p>
+    <a href="/download?file=main.py&name=main.py" style="
+        padding: 5px 15px;
+        background: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 20px;
+        font-size: 14px;
+    ">Скачать</a>
+</div>
+"""
+
 def create_html_from_folder(path: Path):
     ip = gethostbyname(gethostname())
     is_show_secret_file = False
@@ -50,22 +73,22 @@ def create_html_from_folder(path: Path):
         file.write(f'<html><head><title>HTTP SERVER</title></head><body style="background: {background_color}; color: {font_color}; font-family: Arial; padding: {padding_body};"><h1 style="text-align: center;">IP: {ip}:8000</h1>')
     file = open("index.html", "a")
     for root, dirs, files in path.walk():
-        print("Папка:", root.absolute(), root.relative_to(path))
+        print("Root:", root.absolute(), root.relative_to(path), root)
         print({root.relative_to(path).parts})
         if root.name:
-            if root.relative_to(path).parts[0][0] == "." and not is_show_secret_file:
+            if root.parts[0][0] == "." and not is_show_secret_file:
                 secret_file_html += f'<details style="background: #ffffff10; border-radius: 10px; padding: 10px;">\n<summary style="{details_style}">Show secret file</summary>'
                 is_show_secret_file = True
-            if root.relative_to(path).parts[0][0] == ".":
+            if root.parts[0][0] == ".":
                 is_secret_file = True
 
         if not is_secret_file:
-            file.write(f'<p>{root.relative_to(path)}</p>\n<ul style="list-style: none; padding: {padding_body};">')
+            file.write(f'<div style="display: flex; justify-content: space-between; align-items: center;">\n<p>{root.relative_to(path)}</p>\n<a href="/download?file=zip:{root.absolute()}&name={root.resolve().name}.zip" style="{zip_button_style}">download zip</a></div><ul style="list-style: none; padding: {padding_body};">')
         else:
             secret_file_html += f'<p>{root.relative_to(path)}</p>\n<ul style="list-style: none; padding: {padding_body};">'
         for name in files:
             file_path = root/name
-            print("  файл:", name)
+            print("  file:", name)
             if not is_secret_file:
                 file.write(f'\n<li style="display: flex; justify-content: space-between; align-items: center; padding: {file_height}; margin-bottom: {file_margin_bottom}; background: {file_background_color}; border-radius: {file_border_radius};">')
                 file.write(f'\n<span>{name}</span>\n<a href="/download?file={file_path}&name={name}" style="{button_style}">download</a>\n</li>')
@@ -82,7 +105,6 @@ def create_html_from_folder(path: Path):
     file.write(secret_file_html)
     file.write("</body></html></h1></body></html>")
 
-create_html_from_folder(folder_path)
 
 class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -105,14 +127,33 @@ class MyHandler(BaseHTTPRequestHandler):
                 name = Path(filepath).name
 
             if filepath:
+                print("path",filepath)
                 self.send_response(200)
                 self.send_header("Content-type", "application/octet-stream")
                 self.send_header("Content-Disposition", f'attachment; filename="{name}"')
                 self.end_headers()
+
+                if filepath.startswith("zip:"):
+                    folder = Path(filepath[4:])
+                    zip_path = Path("archive.zip")
+
+                    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                        for root, dirs, files in os.walk(folder):
+                            for file in files:
+                                full_path = Path(root) / file
+
+                                arcname = full_path.relative_to(folder)
+
+                                print("Add", full_path)
+                                zipf.write(full_path, arcname)
+
+                    filepath = zip_path
+
                 with open(filepath, "rb") as f:
                     self.wfile.write(f.read())
 
 
+create_html_from_folder(folder_path)
 server = HTTPServer(("0.0.0.0", 8000), MyHandler)
 webbrowser.open("http://localhost:8000")
 server.serve_forever()
