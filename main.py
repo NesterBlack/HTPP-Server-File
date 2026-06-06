@@ -141,6 +141,6 @@ class MyHandler(BaseHTTPRequestHandler):
 
 
 create_html_from_folder(folder_path)
-server = HTTPSrver(("0.0.0.0", 8000), MyHandler)
+server = ThreadingHTTPServer(("0.0.0.0", 8000), MyHandler)
 webbrowser.open("http://localhost:8000")
 server.serve_forever()
