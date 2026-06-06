@@ -1,4 +1,4 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 import sys
 import os
@@ -48,19 +48,6 @@ if len(sys.argv) > 1:
 else:
     folder_path = Path(r".")
 
-"""
-<div style="display: flex; justify-content: space-between; align-items: center;">
-    <p style="margin: 0;">Какой-то текст</p>
-    <a href="/download?file=main.py&name=main.py" style="
-        padding: 5px 15px;
-        background: #4CAF50;
-        color: white;
-        text-decoration: none;
-        border-radius: 20px;
-        font-size: 14px;
-    ">Скачать</a>
-</div>
-"""
 
 def create_html_from_folder(path: Path):
     ip = gethostbyname(gethostname())
@@ -154,6 +141,6 @@ class MyHandler(BaseHTTPRequestHandler):
 
 
 create_html_from_folder(folder_path)
-server = HTTPServer(("0.0.0.0", 8000), MyHandler)
+server = HTTPSrver(("0.0.0.0", 8000), MyHandler)
 webbrowser.open("http://localhost:8000")
 server.serve_forever()
