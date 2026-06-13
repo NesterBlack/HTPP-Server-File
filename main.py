@@ -70,7 +70,7 @@ def create_html_from_folder(path: Path):
                 is_secret_file = True
 
         if not is_secret_file:
-            file.write(f'<div style="display: flex; justify-content: space-between; align-items: center;">\n<p>{root.relative_to(path)}</p>\n<a href="/download?file=zip:{root.absolute()}&name={root.resolve().name}.zip" style="{zip_button_style}">download zip</a></div><ul style="list-style: none; padding: {padding_body};">')
+            file.write(f'<div style="display: flex; justify-content: space-between; align-items: center;">\n<p>{root.relative_to(path)}</p>\n<a href="/download?file=zip:{root.absolute()}&name=zipFiles.zip" style="{zip_button_style}">download zip</a></div><ul style="list-style: none; padding: {padding_body};">')
         else:
             secret_file_html += f'<p>{root.relative_to(path)}</p>\n<ul style="list-style: none; padding: {padding_body};">'
         for name in files:
